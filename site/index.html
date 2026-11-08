@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <title>АВТОТРЕЙД — работа вахтой на месторождениях</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+<body>
+    <div id="pr"></div>
+    <nav>
+        <div class="w"><b>АВТО<i>ТРЕЙД</i></b><div><a href="#vac">Вакансии</a><a href="#cond">Условия</a><a href="#fleet">Техника</a><a href="#rev">Отзывы</a></div></div></nav>
+
+<section class="hero"><div class="blob b1"></div><div class="blob b2"></div>
+<div class="w"><div>
+<h1>Работа вахтой на <span>месторождениях</span> Газпрома и Роснефти</h1>
+<p>Официальное трудоустройство, белая зарплата и северный стаж. Билеты, спецодежда и медкомиссия — за счёт компании.</p>
+<button class="btn p" data-apply="">Откликнуться на вакансию</button> <a href="#vac"><button class="btn">Смотреть вакансии</button></a></div>
+<svg class="pump" viewBox="0 0 200 120"><path d="M20 112h160"/><path d="M80 112l20-66 20 66M88 90h24"/><g class="beam"><path d="M38 46h124"/><path d="M38 38q-14 12 0 28"/><path d="M162 46v30"/></g></svg>
+</div></section>
+
+<main class="w">
+<div class="stats">
+<div class="st"><b data-n="10">0</b><span>открытых вакансий</span></div>
+<div class="st"><b data-n="209000" data-s=" ₽">0</b><span>до — оклад + суточные</span></div>
+<div class="st"><b data-n="2">0</b><span>выплаты в месяц</span></div>
+<div class="st"><b>График вахты согласовывается</b><span>графики вахты</span></div>
+</div>
+
+<h2 class="reveal" id="cond">Условия работы</h2><p class="sub">Всё честно и по закону</p>
+<div class="grid" id="conds"></div>
+
+<h2 class="reveal">Как попасть к нам</h2><p class="sub">Пять шагов до выезда на вахту</p>
+<div class="steps">
+<div class="step reveal"><b>Отклик</b><br><span class="mu">Оставьте заявку на сайте</span></div>
+<div class="step reveal"><b>Звонок специалиста по подбору персонала</b><br><span class="mu">Обсудим вакансию и график</span></div>
+<div class="step reveal"><b>Звонок вам от транспортного отдела</b><br><span class="mu">Для согласования</span></div>
+<div class="step reveal"><b>Медкомиссия</b><br></div>
+<div class="step reveal"><b>Заезд на вахту</b><br><span class="mu">Билеты и спецодежда от нас</span></div>
+</div>
+
+<h2 class="reveal" id="vac">Вакансии</h2><p class="sub">Выберите месторождение и профессию</p>
+<div class="bar" id="f1"></div>
+<div class="bar" id="f2"></div>
+<div class="bar"><input id="q" placeholder="Поиск по названию или месторождению" style="max-width:340px"><select id="so"><option value="0">По умолчанию</option><option value="1">Сначала с высокой зарплатой</option></select></div>
+<div id="jobs"></div>
+
+<h2 class="reveal" id="fleet">Техника и месторождения</h2><p class="sub">На чём и где вы будете работать</p>
+<div class="grid">
+<div class="card reveal"><b>Автопарк</b><br><span class="tg">Урал Next: вакуумка</span><span class="tg">Урал Next: самосвал</span><span class="tg">Урал Next: вахтовка</span><span class="tg">Газель Бизнес, 12 мест</span><span class="tg">JAC T6 / T8</span><span class="tg">Автокраны 25 т</span><span class="tg">КМУ</span></div>
+<div class="card reveal"><span class="tg g">Газпром</span><br>Южно-Приобское, Жагрина<br><span class="mu">Общежитие и вагон-городок, столовая</span></div>
+<div class="card reveal"><span class="tg r">Роснефть</span><br>Кондинское, Каменное, Ем-Ёга, Нефтеюганск, Нягань, Северная Приобка<br><span class="mu">Вагон-городок по 4 человека, столовая</span></div>
+</div>
+
+<h2 class="reveal" id="rev">Отзывы о работодателе</h2><p class="sub">Расскажите, как вам работается</p>
+<div id="revs"></div>
+<div class="card"><b>Оставить отзыв</b><br><br>
+<input id="rn" placeholder="Ваше имя" maxlength="40"><br><br>
+<select id="rr"><option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select><br><br>
+<textarea id="rt" rows="3" maxlength="500" placeholder="Ваш отзыв"></textarea><br><br>
+<button class="btn p" id="rs">Отправить</button></div>
+</main>
+
+<footer>© ООО «АВТОТРЕЙД» · Подбор персонала на месторождения</footer>
+
+<dialog id="dlg"><h3 style="margin-top:0">Отклик на вакансию</h3>
+<label>Вакансия</label><select id="av"></select>
+<label>Имя</label><input id="an" maxlength="60">
+<label>Телефон</label><input id="ap" type="tel" placeholder="+7 ___ ___ __ __">
+<label>Город проживания</label><input id="ac" maxlength="60">
+<input id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+<label>Удобный график</label><select id="ag"><option>30/30</option><option>60/30</option><option>90/30</option><option>Любой</option></select>
+<div style="display:flex;gap:8px"><button class="btn p" id="as">Отправить отклик</button><button class="btn" id="ax">Закрыть</button></div></dialog>
+<div class="toast" id="ts"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
