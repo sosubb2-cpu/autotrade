@@ -1,4 +1,10 @@
-import os, re, time, sqlite3, secrets, logging
+import os
+import re
+import time
+import sqlite3
+import secrets
+import logging
+import uvicorn
 from collections import defaultdict
 import httpx
 from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
@@ -9,9 +15,10 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("autotrade")
 
-ADMIN_KEY = os.environ["ADMIN_KEY"]          # ключ входа в /admin
-BOT = os.environ.get("BOT_TOKEN", "")        # Telegram необязателен
+ADMIN_KEY = os.environ.get("ADMIN_KEY", "")          # ключ входа в /admin
+BOT = os.environ.get("BOT_TOKEN", "")                # Telegram необязателен
 CHAT = os.environ.get("CHAT_ID", "")
+
 if len(ADMIN_KEY) < 12:
     raise SystemExit("ADMIN_KEY слишком короткий: нужно минимум 12 символов")
 
@@ -68,7 +75,7 @@ async def notify(text):
         if r.status_code != 200:
             log.warning("telegram status %s", r.status_code)
     except Exception as e:
-        log.warning("telegram failed: %s", e.__class__.__name__)   # токен в лог не пишем
+        log.warning("telegram failed: %s", getattr(e, '__class__', {}).__name__ if hasattr(e, '__class__') else str(e))
 
 # ---------- модели ----------
 class Apply(BaseModel):
@@ -100,7 +107,8 @@ async def apply(a: Apply, request: Request, bg: BackgroundTasks):
         raise HTTPException(429, "too many")
     with db() as c:
         c.execute("INSERT INTO applications(vacancy,name,phone,city,schedule) VALUES(?,?,?,?,?)",
-                  (a.vacancy, a.name, a.phone, a.city, a.schedule))
+                  (a.vacancy, a.name, a.phone, a.city, a.
+                   schedule))
     bg.add_task(notify, f"📩 Новый отклик\nВакансия: {a.vacancy}\nИмя: {a.name}\n"
                         f"Телефон: {a.phone}\nГород: {a.city}\nГрафик: {a.schedule}")
     return {"ok": True}
@@ -111,7 +119,7 @@ async def add_review(r: Review, request: Request, bg: BackgroundTasks):
         raise HTTPException(429, "too many")
     with db() as c:
         c.execute("INSERT INTO reviews(name,rating,text) VALUES(?,?,?)", (r.name, r.rating, r.text))
-    bg.add_task(notify, f"⭐ Новый отзыв ({r.rating}/5) от {r.name}\n{r.text}\n\nМодерация: страница /admin на сайте")
+    bg.add_task(notify, f"⭐️ Новый отзыв ({r.rating}/5) от {r.name}\n{r.text}\n\nМодерация: страница /admin на сайте")
     return {"ok": True}
 
 @app.get("/api/reviews")
@@ -147,4 +155,8 @@ def admin_review(rid: int, f: Flag, request: Request):
         c.execute("UPDATE reviews SET ok=? WHERE id=?", (f.value, rid))
     return {"ok": True}
 
-app.mount("/", StaticFiles(directory="site", html=True), name="site")   # всегда в самом конце
+app.mount("/", StaticFiles(directory="site", html=True), name="site")
+
+if name == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
