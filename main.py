@@ -68,9 +68,11 @@ nav span{font-size:14px;color:#c9cfd9}
 .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.42;animation:fl 12s ease-in-out infinite alternate;z-index:-1}
 .b1{width:340px;height:340px;background:#ff7a1a;left:-90px;top:-110px}.b2{width:300px;height:300px;background:#2f6bff;right:-70px;bottom:-110px;animation-delay:-5s}
 @keyframes fl{to{transform:translate(50px,36px) scale(1.18)}}
-.pump{width:100%;max-width:220px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 20px rgba(255,122,26,.45))}
-.pump *{stroke:var(--ac);fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
-.beam{transform-origin:100px 46px;animation:rock 3s ease-in-out infinite alternate}@keyframes rock{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+.gears{position:relative;width:130px;height:100px;margin:0 auto 14px;filter:drop-shadow(0 0 20px rgba(255,122,26,.45))}
+.gears svg{position:absolute;fill:none;stroke:var(--ac);stroke-width:3;stroke-linejoin:round}
+.g1{left:0;top:0;width:78px;height:78px;animation:rot 8s linear infinite}
+.g2{right:0;bottom:0;width:58px;height:58px;stroke:var(--ac2)!important;animation:rot 6s linear infinite reverse}
+@keyframes rot{to{transform:rotate(360deg)}}
 .hero h1{font-size:clamp(30px,7vw,48px);line-height:1.1;letter-spacing:-.02em;font-weight:800;margin:0 0 14px}
 .hero h1 span{background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero p{color:#c3cad6;max-width:520px;margin:0 auto;font-size:17px}
@@ -88,7 +90,7 @@ footer div{background:#0b0d11;color:#97a0b0;text-align:center;padding:30px 18px;
 <nav><div class="w"><b>АВТО<i>ТРЕЙД</i></b><span>Вахта на месторождениях</span></div></nav>
 <section class="hero"><div class="blob b1"></div><div class="blob b2"></div>
 <div class="w">
-<svg class="pump" viewBox="0 0 200 120"><path d="M20 112h160"/><path d="M80 112l20-66 20 66M88 90h24"/><g class="beam"><path d="M38 46h124"/><path d="M38 38q-14 12 0 28"/><path d="M162 46v30"/></g></svg>
+<div class="gears"><svg class="g1" viewBox="0 0 64 64"><path d="M28 4h8l2 8 6 3 7-4 6 6-4 7 3 6 8 2v8l-8 2-3 6 4 7-6 6-7-4-6 3-2 8h-8l-2-8-6-3-7 4-6-6 4-7-3-6-8-2v-8l8-2 3-6-4-7 6-6 7 4 6-3z"/><circle cx="32" cy="32" r="9"/></svg><svg class="g2" viewBox="0 0 64 64"><path d="M28 4h8l2 8 6 3 7-4 6 6-4 7 3 6 8 2v8l-8 2-3 6 4 7-6 6-7-4-6 3-2 8h-8l-2-8-6-3-7 4-6-6 4-7-3-6-8-2v-8l8-2 3-6-4-7 6-6 7 4 6-3z"/><circle cx="32" cy="32" r="9"/></svg></div>
 <h1>Технические <span>работы</span></h1>
 <p>Мы обновляем сайт, чтобы он работал лучше.</p>
 </div></section>
