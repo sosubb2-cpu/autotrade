@@ -4,27 +4,51 @@
 <meta name="robots" content="noindex">
 <title>Админка — АВТОТРЕЙД</title>
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--tx:#14171c;--mu:#667085;--bd:#e2e5ea;--ac:#ff7a1a}
-@media(prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#181b21;--tx:#eef0f4;--mu:#9aa3b2;--bd:#2a2f38;color-scheme:dark}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.w{max-width:900px;margin:0 auto;padding:16px}
-h1{font-size:22px;margin:8px 0 16px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:10px}
-.card.done{opacity:.55}
-.row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
+:root{--bg:#f3f4f7;--card:#fff;--tx:#12151b;--mu:#667085;--bd:#e3e6ec;--ac:#ff7a1a;--ac2:#ffb347;--r:18px;--sh:0 10px 30px rgba(20,24,40,.08)}
+@media(prefers-color-scheme:dark){:root{--bg:#0d0f13;--card:#171a20;--tx:#eef0f4;--mu:#97a0b0;--bd:#262b34;--sh:0 10px 30px rgba(0,0,0,.35);color-scheme:dark}}
+*{box-sizing:border-box}html,body{max-width:100%;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:50;background:rgba(11,13,17,.8);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07);color:#fff;padding-top:env(safe-area-inset-top,0px)}
+nav .w{display:flex;justify-content:space-between;align-items:center;height:58px;padding-top:0;padding-bottom:0}
+nav b{font-size:19px;letter-spacing:.6px}nav b i{color:var(--ac);font-style:normal}nav span{font-size:14px;color:#c9cfd9}
+.w{max-width:900px;margin:0 auto;padding:18px}
+.card{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px 16px 24px;margin-bottom:12px;box-shadow:var(--sh);transition:.25s}
+.card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--ac)}
+.card.done{opacity:.55}.card.done:before{background:var(--bd)}
+#lg .card{max-width:420px;margin:40px auto}
+.row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
 .mu{color:var(--mu);font-size:14px}
-button,input{font:inherit;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px}
-button{cursor:pointer}button.p{background:var(--ac);border-color:var(--ac);color:#1a1206;font-weight:600}
-button.on{border-color:var(--ac);color:var(--ac)}
+button,input,textarea{font:inherit;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:10px 18px;transition:.2s}
+input,textarea{padding:12px}
+input:focus,textarea:focus{outline:2px solid var(--ac);outline-offset:1px}
+button{cursor:pointer;font-weight:600}
+button.p{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#1a1206;border:0}
+button.p:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(255,122,26,.4)}
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.bar button{border-radius:22px;padding:8px 16px;font-size:14px;font-weight:400}
+.bar button.on{background:linear-gradient(135deg,var(--ac),var(--ac2));border-color:transparent;color:#1a1206;font-weight:700}
 a{color:var(--ac)}
-</style></head><body><div class="w">
-<h1>АВТОТРЕЙД — админка</h1>
+.mp:before{background:#2f9e5b}.mp.on:before{background:#e5484d}.mp.on{background:rgba(229,72,77,.07)}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:2px 11px;border-radius:20px;background:rgba(47,158,91,.15);color:#2f9e5b}
+.mp.on .st{background:rgba(229,72,77,.15);color:#e5484d}.st:before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.mp.on .st:before{animation:bl 1.2s infinite}@keyframes bl{50%{opacity:.25}}
+.sw{position:relative;width:56px;height:30px;padding:0;border-radius:99px;background:#9aa3b2;border:0;flex:none}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.mp.on .sw{background:#e5484d}.mp.on .sw:after{left:29px}
+.mp textarea{width:100%;margin-top:10px;resize:vertical}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><nav><div class="w"><b>АВТО<i>ТРЕЙД</i></b><span>админка</span></div></nav>
+<div class="w">
 <div id="lg"><div class="card"><p>Введите ключ доступа</p>
-<input id="key" type="password" autocomplete="current-password" style="width:100%;max-width:340px">
+<input id="key" type="password" autocomplete="current-password" style="width:100%;margin-bottom:12px">
 <button class="p" id="go">Войти</button><p class="mu" id="err"></p></div></div>
 <div id="app" hidden>
 <div class="bar"><button id="t1"></button><button id="t2"></button><button id="rf">Обновить</button><button id="csv">Скачать CSV</button><button id="out">Выйти</button></div>
+<div class="card mp" id="mp">
+<div class="row" style="align-items:center"><div><b>Режим техработ</b> <span class="st" id="mst"></span>
+<div class="mu" id="mtx"></div></div><button class="sw" id="msw" aria-label="Переключить режим техработ"></button></div>
+<textarea id="mmsg" rows="2" maxlength="200" placeholder="Сообщение для посетителей (необязательно), например: Вернёмся в 18:00 по Тюмени"></textarea>
+<div style="margin-top:8px"><button id="msv">Сохранить текст</button></div></div>
 <div id="list"></div></div>
 </div>
 <script>
@@ -38,11 +62,19 @@ function logout(m){K="";sessionStorage.removeItem("k");$("app").hidden=true;$("l
 function load(){return api("/api/admin/data").then(function(d){D=d;$("lg").hidden=true;$("app").hidden=false;draw()}).catch(function(){})}
 $("go").onclick=function(){K=$("key").value.trim();sessionStorage.setItem("k",K);load()};
 $("key").onkeydown=function(e){if(e.key=="Enter")$("go").click()};
+function mset(on){api("/api/admin/maintenance",{on:on,message:$("mmsg").value.trim()}).then(load)}
+$("msw").onclick=function(){var on=!D.maintenance.on;
+if(on&&!confirm("Включить техработы? Сайт станет недоступен для посетителей, заявки приниматься не будут."))return;mset(on)};
+$("msv").onclick=function(){mset(D.maintenance.on)};
 $("out").onclick=function(){logout("")};$("rf").onclick=load;
 $("t1").onclick=function(){tab="a";draw()};$("t2").onclick=function(){tab="r";draw()};
 function draw(){
 var na=D.applications.filter(function(a){return !a.done}).length,nr=D.reviews.filter(function(r){return r.ok==0}).length;
 $("t1").textContent="Отклики (новых: "+na+")";$("t2").textContent="Отзывы (на проверке: "+nr+")";
+var M=D.maintenance;$("mp").className="card mp"+(M.on?" on":"");
+$("mst").textContent=M.on?"Включены":"Выключены";
+$("mtx").textContent=M.on?"Сайт закрыт заглушкой, заявки не принимаются":"Сайт работает в обычном режиме";
+if(document.activeElement!==$("mmsg"))$("mmsg").value=M.message||"";
 $("t1").className=tab=="a"?"on":"";$("t2").className=tab=="r"?"on":"";
 var L=$("list");L.textContent="";
 if(tab=="a"){D.applications.forEach(function(a){
