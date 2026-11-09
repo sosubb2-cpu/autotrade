@@ -1,0 +1,15 @@
+[Unit]
+Description=autotrade
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/autotrade
+Environment=ADMIN_KEY=ДЛИННАЯ_СЛУЧАЙНАЯ_СТРОКА
+# Telegram необязателен. Если не нужен, удалите две строки ниже:
+Environment=BOT_TOKEN=ВАШ_ТОКЕН
+Environment=CHAT_ID=ВАШ_CHAT_ID
+ExecStart=/opt/autotrade/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
