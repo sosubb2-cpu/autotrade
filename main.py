@@ -100,7 +100,7 @@ footer div{background:#0b0d11;color:#97a0b0;text-align:center;padding:30px 18px;
 <div class="bar"><i></i></div>
 <small>Страница обновится сама, когда сайт снова будет доступен</small>
 </div></main>
-<footer><div>© ООО «АВТОТРЕЙД» · Подбор персонала на месторождения</div></footer>
+<footer><div>© ООО «АВТОТРЕЙД» · Автотранспортное предприятие</div></footer>
 <script>
 setInterval(function(){fetch("/",{cache:"no-store"}).then(function(r){if(r.status!==503)location.reload()}).catch(function(){})},20000);
 </script>
