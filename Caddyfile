@@ -1,0 +1,8 @@
+НОВЫЙ-ДОМЕН.ru, www.НОВЫЙ-ДОМЕН.ru {
+    reverse_proxy 127.0.0.1:8000
+}
+
+# старый адрес ведёт на новый (постоянный редирект)
+avtotrade-vahta.ru, www.avtotrade-vahta.ru {
+    redir https://НОВЫЙ-ДОМЕН.ru{uri} permanent
+}
