@@ -37,7 +37,7 @@ var dlg='<dialog id="dlg"><h3 style="margin-top:0">Отклик на вакан�
 '<label>Телефон</label><input id="ap" type="tel" placeholder="+7 ___ ___ __ __">'+
 '<label>Город проживания</label><input id="ac" maxlength="60">'+
 '<input id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">'+
-'<label style="display:flex;gap:10px;align-items:flex-start;color:var(--tx);font-size:13px;margin-bottom:14px"><input type="checkbox" id="cn" style="width:auto;margin:3px 0 0"><span>Я даю <a href="consent.html" target="_blank" style="color:var(--ac)">согласие на обработку персональных данных</a> и ознакомился с <a href="privacy.html" target="_blank" style="color:var(--ac)">Политикой</a></span></label>'+
+'<label style="display:flex;gap:10px;align-items:flex-start;color:var(--tx);font-size:13px;margin-bottom:14px"><input type="checkbox" id="cn" style="width:auto;margin:3px 0 0"><span>Я даю <a href="/consent" target="_blank" style="color:var(--ac)">согласие на обработку персональных данных</a> и ознакомился с <a href="/privacy" target="_blank" style="color:var(--ac)">Политикой</a></span></label>'+
 '<div style="display:flex;gap:8px"><button class="btn p" id="as">Отправить отклик</button><button class="btn" id="ax">Закрыть</button></div></dialog><div class="toast" id="ts"></div>';
 document.body.insertAdjacentHTML("afterbegin",'<div id="pr"></div>'+top+nav);
 document.body.insertAdjacentHTML("beforeend",foot+dlg);
