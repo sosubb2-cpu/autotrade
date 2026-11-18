@@ -346,8 +346,10 @@ def clean_page(page: str):
     path = f"site/{page}.html"
     if os.path.isfile(path):
         return FileResponse(path)
+    static = os.path.join("site", page)  # style.css, script.js и т.д.
+    if "." in page and os.path.isfile(static):
+        return FileResponse(static)
     raise HTTPException(404)
-
 
 app.mount("/", StaticFiles(directory="site", html=True), name="site")
 
