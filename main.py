@@ -16,12 +16,13 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("autotrade")
 
-ADMIN_KEY = os.environ.get("ADMIN_KEY", "")          # ключ входа в /admin
-BOT = os.environ.get("BOT_TOKEN", "")                # Telegram необязателен
+ADMIN_KEY = os.environ.get("ADMIN_KEY", "")  # ключ входа в /admin
+BOT = os.environ.get("BOT_TOKEN", "")  # Telegram необязателен
 CHAT = os.environ.get("CHAT_ID", "")
 
 if len(ADMIN_KEY) < 12:
     raise SystemExit("ADMIN_KEY слишком короткий: нужно минимум 12 символов")
+
 
 # ---------- база ----------
 def db():
@@ -29,13 +30,16 @@ def db():
     c.row_factory = sqlite3.Row
     return c
 
+
 with db() as c:
     c.execute("""CREATE TABLE IF NOT EXISTS applications(
         id INTEGER PRIMARY KEY, vacancy TEXT, name TEXT, phone TEXT,
         city TEXT, schedule TEXT, done INT DEFAULT 0, ts DEFAULT CURRENT_TIMESTAMP)""")
-    c.execute("""CREATE TABLE IF NOT EXISTS reviews(
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS reviews(
         id INTEGER PRIMARY KEY, name TEXT, rating INT, text TEXT,
-        ok INT DEFAULT 0, ts DEFAULT CURRENT_TIMESTAMP)""")   # ok: 0 ждёт, 1 опубликован, -1 скрыт
+        ok INT DEFAULT 0, ts DEFAULT CURRENT_TIMESTAMP)"""
+    )  # ok: 0 ждёт, 1 опубликован, -1 скрыт
     c.execute("CREATE TABLE IF NOT EXISTS settings(k TEXT PRIMARY KEY, v TEXT)")
     for col in ("done INT DEFAULT 0", "consent_ts TEXT"):
         try:
@@ -44,26 +48,34 @@ with db() as c:
             pass
 
 # ---------- срок хранения заявок (152-ФЗ: не дольше, чем нужно для цели) ----------
-RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "365"))   # в политике сайта указано 12 месяцев
+RETENTION_DAYS = int(
+    os.environ.get("RETENTION_DAYS", "365")
+)  # в политике сайта указано 12 месяцев
 _last_purge = [0.0]
+
 
 def purge(force=False):
     if not force and time.time() - _last_purge[0] < 3600:
         return
     _last_purge[0] = time.time()
     with db() as c:
-        n = c.execute("DELETE FROM applications WHERE ts < datetime('now', ?)",
-                      (f"-{RETENTION_DAYS} days",)).rowcount
+        n = c.execute(
+            "DELETE FROM applications WHERE ts < datetime('now', ?)",
+            (f"-{RETENTION_DAYS} days",),
+        ).rowcount
     if n:
         log.info("purged %s old applications", n)
 
+
 purge(True)
+
 
 # ---------- режим техработ ----------
 def _get(k, d=""):
     with db() as c:
         r = c.execute("SELECT v FROM settings WHERE k=?", (k,)).fetchone()
     return r["v"] if r else d
+
 
 MAINT = {"on": _get("maint_on", "0") == "1", "message": _get("maint_msg", "")}
 
@@ -126,9 +138,11 @@ setInterval(function(){fetch("/",{cache:"no-store"}).then(function(r){if(r.statu
 # ---------- защита от спама ----------
 hits = defaultdict(list)
 
+
 def client_ip(r: Request):
     xf = r.headers.get("x-forwarded-for", "").split(",")[0].strip()
     return xf or (r.client.host if r.client else "?")
+
 
 def limited(ip, key, n, sec):
     """True, если с этого IP за sec секунд уже было n обращений."""
@@ -140,6 +154,7 @@ def limited(ip, key, n, sec):
     hits[k].append(now)
     return False
 
+
 def check_admin(r: Request):
     given = r.headers.get("x-admin-key", "").encode()
     if not secrets.compare_digest(given, ADMIN_KEY.encode()):
@@ -147,18 +162,25 @@ def check_admin(r: Request):
             raise HTTPException(429, "too many attempts")
         raise HTTPException(403, "forbidden")
 
+
 # ---------- Telegram (необязательное уведомление) ----------
 async def notify(text):
     if not (BOT and CHAT):
         return
     try:
         async with httpx.AsyncClient(timeout=10) as h:
-            r = await h.post(f"https://api.telegram.org/bot{BOT}/sendMessage",
-                             json={"chat_id": CHAT, "text": text})
+            r = await h.post(
+                f"https://api.telegram.org/bot{BOT}/sendMessage",
+                json={"chat_id": CHAT, "text": text},
+            )
         if r.status_code != 200:
             log.warning("telegram status %s", r.status_code)
     except Exception as e:
-        log.warning("telegram failed: %s", getattr(e, '__class__', {}).__name__ if hasattr(e, '__class__') else str(e))
+        log.warning(
+            "telegram failed: %s",
+            getattr(e, "__class__", {}).__name__ if hasattr(e, "__class__") else str(e),
+        )
+
 
 # ---------- модели ----------
 class Apply(BaseModel):
@@ -167,40 +189,50 @@ class Apply(BaseModel):
     phone: str = Field(min_length=10, max_length=20)
     city: str = Field(min_length=2, max_length=60)
     schedule: str = Field(max_length=20)
-    website: str = Field(default="", max_length=100)   # скрытое поле-ловушка для ботов
-    consent: bool = False                              # согласие на обработку персональных данных
+    website: str = Field(default="", max_length=100)  # скрытое поле-ловушка для ботов
+    consent: bool = False  # согласие на обработку персональных данных
+
 
 class Review(BaseModel):
     name: str = Field(default="Аноним", max_length=40)
     rating: int = Field(ge=1, le=5)
     text: str = Field(min_length=5, max_length=500)
 
+
 class Maint(BaseModel):
     on: bool
     message: str = Field(default="", max_length=200)
 
+
 class Flag(BaseModel):
     value: int = Field(ge=-1, le=1)
 
+
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
 
 @app.middleware("http")
 async def maintenance(request: Request, call_next):
     if MAINT["on"]:
         p = request.url.path
-        if not (p == "/admin" or p.startswith("/api/admin")):   # админка работает всегда
+        if not (p == "/admin" or p.startswith("/api/admin")):  # админка работает всегда
             h = {"Retry-After": "3600", "Cache-Control": "no-store"}
             if p.startswith("/api/"):
-                return JSONResponse({"detail": "maintenance"}, status_code=503, headers=h)
+                return JSONResponse(
+                    {"detail": "maintenance"}, status_code=503, headers=h
+                )
             m = MAINT["message"].strip()
             extra = f'<div class="msg">{html.escape(m)}</div>' if m else ""
-            return HTMLResponse(MAINT_PAGE.replace("{extra}", extra), status_code=503, headers=h)
+            return HTMLResponse(
+                MAINT_PAGE.replace("{extra}", extra), status_code=503, headers=h
+            )
     return await call_next(request)
+
 
 # ---------- публичные запросы сайта ----------
 @app.post("/api/apply")
 async def apply(a: Apply, request: Request, bg: BackgroundTasks):
-    if a.website:                      # заполнила ловушка: молча «принимаем» и выбрасываем
+    if a.website:  # заполнила ловушка: молча «принимаем» и выбрасываем
         return {"ok": True}
     if not a.consent:
         raise HTTPException(422, "consent required")
@@ -209,47 +241,74 @@ async def apply(a: Apply, request: Request, bg: BackgroundTasks):
     if limited(client_ip(request), "apply", 5, 600):
         raise HTTPException(429, "too many")
     with db() as c:
-        c.execute("INSERT INTO applications(vacancy,name,phone,city,schedule,consent_ts) VALUES(?,?,?,?,?,datetime('now'))",
-                  (a.vacancy, a.name, a.phone, a.city, a.schedule))
-    bg.add_task(notify, f"📩 Новый отклик\nВакансия: {a.vacancy}\nИмя: {a.name}\n"
-                        f"Телефон: {a.phone}\nГород: {a.city}\nГрафик: {a.schedule}")
+        c.execute(
+            "INSERT INTO applications(vacancy,name,phone,city,schedule,consent_ts) VALUES(?,?,?,?,?,datetime('now'))",
+            (a.vacancy, a.name, a.phone, a.city, a.schedule),
+        )
+    bg.add_task(
+        notify,
+        f"📩 Новый отклик\nВакансия: {a.vacancy}\nИмя: {a.name}\n"
+        f"Телефон: {a.phone}\nГород: {a.city}\nГрафик: {a.schedule}",
+    )
     return {"ok": True}
+
 
 @app.post("/api/reviews")
 async def add_review(r: Review, request: Request, bg: BackgroundTasks):
     if limited(client_ip(request), "review", 3, 600):
         raise HTTPException(429, "too many")
     with db() as c:
-        c.execute("INSERT INTO reviews(name,rating,text) VALUES(?,?,?)", (r.name, r.rating, r.text))
-    bg.add_task(notify, f"⭐️ Новый отзыв ({r.rating}/5) от {r.name}\n{r.text}\n\nМодерация: страница /admin на сайте")
+        c.execute(
+            "INSERT INTO reviews(name,rating,text) VALUES(?,?,?)",
+            (r.name, r.rating, r.text),
+        )
+    bg.add_task(
+        notify,
+        f"⭐️ Новый отзыв ({r.rating}/5) от {r.name}\n{r.text}\n\nМодерация: страница /admin на сайте",
+    )
     return {"ok": True}
+
 
 @app.get("/api/reviews")
 def public_reviews():
     with db() as c:
-        rows = c.execute("SELECT name,rating,text FROM reviews WHERE ok=1 ORDER BY id DESC LIMIT 50")
+        rows = c.execute(
+            "SELECT name,rating,text FROM reviews WHERE ok=1 ORDER BY id DESC LIMIT 50"
+        )
         return [dict(x) for x in rows]
+
 
 # ---------- админка ----------
 @app.get("/admin")
 def admin_page():
     return FileResponse("admin.html")
 
+
 @app.get("/api/admin/data")
 def admin_data(request: Request):
     check_admin(request)
     purge()
     with db() as c:
-        apps = [dict(x) for x in c.execute("SELECT * FROM applications ORDER BY id DESC LIMIT 1000")]
-        revs = [dict(x) for x in c.execute("SELECT * FROM reviews ORDER BY id DESC LIMIT 300")]
+        apps = [
+            dict(x)
+            for x in c.execute("SELECT * FROM applications ORDER BY id DESC LIMIT 1000")
+        ]
+        revs = [
+            dict(x)
+            for x in c.execute("SELECT * FROM reviews ORDER BY id DESC LIMIT 300")
+        ]
     return {"applications": apps, "reviews": revs, "maintenance": MAINT}
+
 
 @app.post("/api/admin/applications/{aid}")
 def admin_app(aid: int, f: Flag, request: Request):
     check_admin(request)
     with db() as c:
-        c.execute("UPDATE applications SET done=? WHERE id=?", (1 if f.value == 1 else 0, aid))
+        c.execute(
+            "UPDATE applications SET done=? WHERE id=?", (1 if f.value == 1 else 0, aid)
+        )
     return {"ok": True}
+
 
 @app.post("/api/admin/applications/{aid}/delete")
 def admin_app_delete(aid: int, request: Request):
@@ -258,6 +317,7 @@ def admin_app_delete(aid: int, request: Request):
         c.execute("DELETE FROM applications WHERE id=?", (aid,))
     return {"ok": True}
 
+
 @app.post("/api/admin/reviews/{rid}")
 def admin_review(rid: int, f: Flag, request: Request):
     check_admin(request)
@@ -265,14 +325,29 @@ def admin_review(rid: int, f: Flag, request: Request):
         c.execute("UPDATE reviews SET ok=? WHERE id=?", (f.value, rid))
     return {"ok": True}
 
+
 @app.post("/api/admin/maintenance")
 def admin_maint(m: Maint, request: Request):
     check_admin(request)
     MAINT["on"], MAINT["message"] = m.on, m.message
     with db() as c:
-        c.execute("INSERT OR REPLACE INTO settings(k,v) VALUES('maint_on',?)", ("1" if m.on else "0",))
-        c.execute("INSERT OR REPLACE INTO settings(k,v) VALUES('maint_msg',?)", (m.message,))
+        c.execute(
+            "INSERT OR REPLACE INTO settings(k,v) VALUES('maint_on',?)",
+            ("1" if m.on else "0",),
+        )
+        c.execute(
+            "INSERT OR REPLACE INTO settings(k,v) VALUES('maint_msg',?)", (m.message,)
+        )
     return {"ok": True}
+
+
+@app.get("/{page}")
+def clean_page(page: str):
+    path = f"site/{page}.html"
+    if os.path.isfile(path):
+        return FileResponse(path)
+    raise HTTPException(404)
+
 
 app.mount("/", StaticFiles(directory="site", html=True), name="site")
 
